@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dr. Wellbeing Chat</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
@@ -33,15 +31,18 @@
     .chat-header {
       background: #075e54;
       color: white;
-      padding: 15px;
-      font-weight: bold;
+      padding: 10px 15px;
       display: flex;
-      align-items: center;
+      flex-direction: column;
     }
 
-    .chat-header::before {
-      content: "🩺";
-      margin-right: 10px;
+    .chat-header strong {
+      font-size: 18px;
+    }
+
+    .chat-header small {
+      font-size: 13px;
+      color: #d2f8d2;
     }
 
     .chat-body {
@@ -60,6 +61,15 @@
       max-width: 80%;
       font-size: 15px;
       line-height: 1.4;
+      position: relative;
+    }
+
+    .message .timestamp {
+      font-size: 11px;
+      color: #555;
+      position: absolute;
+      bottom: 3px;
+      right: 10px;
     }
 
     .user {
@@ -111,9 +121,15 @@
 </head>
 <body>
   <div class="chat-container">
-    <div class="chat-header">Dr. Wellbeing</div>
+    <div class="chat-header">
+      <strong>Dr. Wellbeing 🩺</strong>
+      <small>online</small>
+    </div>
     <div class="chat-body" id="chatBody">
-      <div class="message bot">Hi! I'm Dr. Wellbeing 👨‍⚕️. How can I help you today?</div>
+      <div class="message bot">
+        Hi! I'm Dr. Wellbeing 👨‍⚕️. How can I help you today?
+        <div class="timestamp" id="ts0"></div>
+      </div>
     </div>
     <div class="chat-input">
       <input type="text" id="userInput" placeholder="Type a message..." />
@@ -176,6 +192,12 @@
       const msgDiv = document.createElement("div");
       msgDiv.className = `message ${sender}`;
       msgDiv.innerText = text;
+
+      const ts = document.createElement("div");
+      ts.className = "timestamp";
+      ts.innerText = getCurrentTime();
+      msgDiv.appendChild(ts);
+
       chatBody.appendChild(msgDiv);
       chatBody.scrollTop = chatBody.scrollHeight;
     }
@@ -183,17 +205,29 @@
     function getBotReply(userInput) {
       const lower = userInput.toLowerCase();
 
-      // Check general chat
       for (const phrase in generalConversations) {
         if (lower.includes(phrase)) return generalConversations[phrase];
       }
 
-      // Check symptom keywords
       for (const keyword in symptomResponses) {
         if (lower.includes(keyword)) return symptomResponses[keyword];
       }
 
       return "Hmm, I'm not sure about that one! Better consult a real doctor 😊";
+    }
+
+    function getCurrentTime() {
+      const now = new Date();
+      let hours = now.getHours();
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12 || 12;
+      return `${hours}:${minutes} ${ampm}`;
+    }
+
+    // Add timestamp to first welcome message
+    window.onload = () => {
+      document.getElementById("ts0").innerText = getCurrentTime();
     }
 
     document.getElementById("userInput").addEventListener("keypress", function(e) {
