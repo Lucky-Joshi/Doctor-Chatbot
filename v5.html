@@ -56,7 +56,7 @@
 
     .message {
       padding: 10px 15px;
-      margin: 5px 0;
+      margin: 8px 0;
       border-radius: 10px;
       max-width: 80%;
       font-size: 15px;
@@ -78,10 +78,39 @@
       border-bottom-right-radius: 0;
     }
 
+    .user::after {
+      content: "";
+      position: absolute;
+      right: -10px;
+      bottom: 0;
+      width: 0;
+      height: 0;
+      border-left: 10px solid #dcf8c6;
+      border-top: 10px solid transparent;
+    }
+
     .bot {
       align-self: flex-start;
       background: #fff;
       border-bottom-left-radius: 0;
+    }
+
+    .bot::after {
+      content: "";
+      position: absolute;
+      left: -10px;
+      bottom: 0;
+      width: 0;
+      height: 0;
+      border-right: 10px solid #fff;
+      border-top: 10px solid transparent;
+    }
+
+    .typing-indicator {
+      font-style: italic;
+      font-size: 13px;
+      color: #888;
+      margin: 5px;
     }
 
     .chat-input {
@@ -123,7 +152,7 @@
   <div class="chat-container">
     <div class="chat-header">
       <strong>Dr. Wellbeing 🩺</strong>
-      <small>online</small>
+      <small id="onlineStatus">online</small>
     </div>
     <div class="chat-body" id="chatBody">
       <div class="message bot">
@@ -181,9 +210,28 @@
       addMessage(userText, "user");
       input.value = "";
 
+      const typingDiv = document.createElement("div");
+      typingDiv.className = "typing-indicator";
+      typingDiv.id = "typing";
+      typingDiv.innerText = "Dr. Wellbeing is typing...";
+      document.getElementById("chatBody").appendChild(typingDiv);
+      scrollToBottom();
+
+      // Update status to typing
+      document.getElementById("onlineStatus").innerText = "typing...";
+
       setTimeout(() => {
         const reply = getBotReply(userText);
+        document.getElementById("typing")?.remove();
         addMessage(reply, "bot");
+
+        // Update status to last seen
+        const now = new Date();
+        const hours = now.getHours();
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        const lastSeen = `${hours % 12 || 12}:${minutes} ${ampm}`;
+        document.getElementById("onlineStatus").innerText = `last seen today at ${lastSeen}`;
       }, 1000);
     }
 
@@ -199,6 +247,11 @@
       msgDiv.appendChild(ts);
 
       chatBody.appendChild(msgDiv);
+      scrollToBottom();
+    }
+
+    function scrollToBottom() {
+      const chatBody = document.getElementById("chatBody");
       chatBody.scrollTop = chatBody.scrollHeight;
     }
 
@@ -225,7 +278,6 @@
       return `${hours}:${minutes} ${ampm}`;
     }
 
-    // Add timestamp to first welcome message
     window.onload = () => {
       document.getElementById("ts0").innerText = getCurrentTime();
     }
