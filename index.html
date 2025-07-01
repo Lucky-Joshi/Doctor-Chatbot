@@ -3,12 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dr. Wellbeing - Health Chatbot</title>
+  <title>Dr. Wellbeing Chat</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f2f2f2;
+      font-family: 'Segoe UI', sans-serif;
+      background: #e5ddd5;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -17,70 +20,88 @@
 
     .chat-container {
       width: 100%;
-      max-width: 400px;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      max-width: 500px;
+      height: 90vh;
+      background: #fff;
       display: flex;
       flex-direction: column;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.15);
       overflow: hidden;
     }
 
     .chat-header {
-      background: #4CAF50;
+      background: #075e54;
       color: white;
       padding: 15px;
-      text-align: center;
       font-weight: bold;
+      display: flex;
+      align-items: center;
+    }
+
+    .chat-header::before {
+      content: "🩺";
+      margin-right: 10px;
     }
 
     .chat-body {
       flex: 1;
       padding: 15px;
+      background: #ece5dd;
       overflow-y: auto;
+      display: flex;
+      flex-direction: column;
     }
 
     .message {
-      margin: 10px 0;
       padding: 10px 15px;
-      border-radius: 20px;
+      margin: 5px 0;
+      border-radius: 10px;
       max-width: 80%;
+      font-size: 15px;
       line-height: 1.4;
     }
 
     .user {
       align-self: flex-end;
-      background: #DCF8C6;
+      background: #dcf8c6;
+      border-bottom-right-radius: 0;
     }
 
     .bot {
       align-self: flex-start;
-      background: #e2e2e2;
+      background: #fff;
+      border-bottom-left-radius: 0;
     }
 
     .chat-input {
       display: flex;
+      padding: 10px;
       border-top: 1px solid #ccc;
+      background: #f0f0f0;
     }
 
     .chat-input input {
       flex: 1;
+      padding: 10px 15px;
       border: none;
-      padding: 15px;
-      font-size: 16px;
+      border-radius: 20px;
       outline: none;
+      font-size: 15px;
     }
 
     .chat-input button {
+      margin-left: 10px;
+      padding: 10px 20px;
       border: none;
-      background: #4CAF50;
+      background: #075e54;
       color: white;
-      padding: 0 20px;
-      font-size: 16px;
+      border-radius: 20px;
+      font-size: 15px;
       cursor: pointer;
     }
 
-    @media (max-width: 500px) {
+    @media (max-width: 600px) {
       .chat-container {
         height: 100vh;
         border-radius: 0;
@@ -90,12 +111,12 @@
 </head>
 <body>
   <div class="chat-container">
-    <div class="chat-header">💬 Dr. Wellbeing</div>
+    <div class="chat-header">Dr. Wellbeing</div>
     <div class="chat-body" id="chatBody">
-      <div class="message bot">Hi! I'm Dr. Wellbeing 👨‍⚕️. Describe your symptoms or just say hello!</div>
+      <div class="message bot">Hi! I'm Dr. Wellbeing 👨‍⚕️. How can I help you today?</div>
     </div>
     <div class="chat-input">
-      <input type="text" id="userInput" placeholder="e.g. I have a headache or Hi" />
+      <input type="text" id="userInput" placeholder="Type a message..." />
       <button onclick="handleUserMessage()">Send</button>
     </div>
   </div>
@@ -125,16 +146,15 @@
     };
 
     const generalConversations = {
-      "hi": "Hello there! How can I assist you today?",
-      "hello": "Hi! I'm Dr. Wellbeing, your friendly health assistant.",
-      "hey": "Hey hey! Tell me what’s bothering you.",
-      "how are you": "I'm always well, thank you! How are you feeling today?",
-      "who are you": "I'm Dr. Wellbeing 👨‍⚕️ — your health chatbot. Ask me anything!",
-      "thank you": "You're very welcome! Stay healthy 😊",
-      "thankyou": "You're very welcome! Stay healthy 😊",
-      "thanks": "Glad to help! Let me know if you need anything else.",
-      "bye": "Take care! Don’t forget to drink water 🥤",
-      "goodbye": "See you soon! Stay safe and well."
+      "hi": "Hello there! 👋",
+      "hello": "Hi! I'm Dr. Wellbeing, your health guide.",
+      "hey": "Hey! How can I help you?",
+      "how are you": "I'm feeling great! Thanks for asking 😊",
+      "who are you": "I'm Dr. Wellbeing 👨‍⚕️, a virtual doctor here to help!",
+      "thank you": "You're most welcome! Stay healthy.",
+      "thanks": "Glad to assist. Take care!",
+      "bye": "Goodbye! Feel better soon 🌿",
+      "goodbye": "Take care! Don't forget to rest."
     };
 
     function handleUserMessage() {
@@ -148,7 +168,7 @@
       setTimeout(() => {
         const reply = getBotReply(userText);
         addMessage(reply, "bot");
-      }, 1000); // typing delay
+      }, 1000);
     }
 
     function addMessage(text, sender) {
@@ -161,20 +181,16 @@
     }
 
     function getBotReply(userInput) {
-      const lowerText = userInput.toLowerCase();
+      const lower = userInput.toLowerCase();
 
-      // Check general conversation first
+      // Check general chat
       for (const phrase in generalConversations) {
-        if (lowerText.includes(phrase)) {
-          return generalConversations[phrase];
-        }
+        if (lower.includes(phrase)) return generalConversations[phrase];
       }
 
-      // Then check for symptoms
+      // Check symptom keywords
       for (const keyword in symptomResponses) {
-        if (lowerText.includes(keyword)) {
-          return symptomResponses[keyword];
-        }
+        if (lower.includes(keyword)) return symptomResponses[keyword];
       }
 
       return "Hmm, I'm not sure about that one! Better consult a real doctor 😊";
