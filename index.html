@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dr. Wellbeing - Health Chatbot</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .chat-container {
+      width: 100%;
+      max-width: 400px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      background: #4CAF50;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .chat-body {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+    }
+
+    .message {
+      margin: 10px 0;
+      padding: 10px 15px;
+      border-radius: 20px;
+      max-width: 80%;
+      line-height: 1.4;
+    }
+
+    .user {
+      align-self: flex-end;
+      background: #DCF8C6;
+    }
+
+    .bot {
+      align-self: flex-start;
+      background: #e2e2e2;
+    }
+
+    .chat-input {
+      display: flex;
+      border-top: 1px solid #ccc;
+    }
+
+    .chat-input input {
+      flex: 1;
+      border: none;
+      padding: 15px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .chat-input button {
+      border: none;
+      background: #4CAF50;
+      color: white;
+      padding: 0 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 500px) {
+      .chat-container {
+        height: 100vh;
+        border-radius: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">💬 Dr. Wellbeing</div>
+    <div class="chat-body" id="chatBody">
+      <div class="message bot">Hi! I'm Dr. Wellbeing 👨‍⚕️. Describe your symptoms or health issue.</div>
+    </div>
+    <div class="chat-input">
+      <input type="text" id="userInput" placeholder="e.g. I have a fever and headache" />
+      <button onclick="handleUserMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const keywordResponses = {
+      "fever": "Stay hydrated, take rest, and consider paracetamol. See a doctor if it persists over 2 days.",
+      "cold": "Rest, drink warm fluids, and avoid cold exposure. Over-the-counter meds may help.",
+      "cough": "Try warm water with honey, avoid cold drinks. See a doctor if it lasts more than a week.",
+      "headache": "Try to rest in a quiet, dark room. Drink water and avoid screen time.",
+      "diarrhea": "Drink ORS or electrolyte solution, avoid spicy food, and stay hydrated.",
+      "vomiting": "Sip water slowly, avoid solid food initially. Ginger tea can help.",
+      "acidity": "Avoid oily/spicy food, eat small meals, and drink cold milk if needed.",
+      "constipation": "Increase fiber in your diet, drink more water, and stay active.",
+      "fatigue": "Ensure enough rest, proper diet, and manage stress. Persistent fatigue needs a checkup.",
+      "pain": "Apply ice or heat based on type of pain. If severe or persistent, consult a doctor.",
+      "rash": "Keep the area clean, avoid scratching. Use soothing lotions or see a skin doctor.",
+      "allergy": "Avoid allergens, take antihistamines if needed. Severe allergies need medical help.",
+      "anxiety": "Try deep breathing, mindfulness, and talking to someone. Professional help is important too.",
+      "depression": "You're not alone. Talk to a mental health expert and loved ones.",
+      "insomnia": "Avoid screens before bed, maintain sleep routine, and reduce caffeine.",
+      "sore throat": "Gargle with warm salt water, drink warm fluids, and rest your voice.",
+      "burn": "Cool with running water, don’t apply ice directly. Cover with clean cloth and seek care if severe.",
+      "infection": "Keep the area clean, don’t self-medicate antibiotics. Doctor consultation is best.",
+      "injury": "Clean wounds gently, apply antiseptic, and rest the injured part.",
+      "nausea": "Eat light, avoid strong smells, and try ginger or peppermint tea."
+    };
+
+    function handleUserMessage() {
+      const input = document.getElementById("userInput");
+      const userText = input.value.trim();
+      if (!userText) return;
+
+      addMessage(userText, "user");
+      input.value = "";
+
+      setTimeout(() => {
+        const reply = getKeywordReply(userText);
+        addMessage(reply, "bot");
+      }, 1000); // typing delay
+    }
+
+    function addMessage(text, sender) {
+      const chatBody = document.getElementById("chatBody");
+      const msgDiv = document.createElement("div");
+      msgDiv.className = `message ${sender}`;
+      msgDiv.innerText = text;
+      chatBody.appendChild(msgDiv);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    function getKeywordReply(userInput) {
+      const lowerText = userInput.toLowerCase();
+
+      for (const keyword in keywordResponses) {
+        if (lowerText.includes(keyword)) {
+          return keywordResponses[keyword];
+        }
+      }
+
+      return "Hmm, I'm not sure about that one! Better consult a real doctor 😊";
+    }
+
+    document.getElementById("userInput").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") handleUserMessage();
+    });
+  </script>
+</body>
+</html>
